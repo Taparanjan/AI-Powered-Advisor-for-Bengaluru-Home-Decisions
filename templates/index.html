@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mortgage Powered Advisor</title>
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --bg-soft: #111622;
+      --panel: rgba(16, 21, 33, 0.88);
+      --panel-strong: rgba(20, 27, 42, 0.95);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.14);
+      --text: #f5f7fb;
+      --muted: #98a2b3;
+      --gold: #f4b860;
+      --gold-strong: #ff8c42;
+      --cyan: #6ee7f9;
+      --success-bg: rgba(26, 59, 49, 0.75);
+      --success-line: rgba(88, 210, 155, 0.35);
+      --error-bg: rgba(90, 24, 34, 0.78);
+      --error-line: rgba(255, 120, 120, 0.35);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 140, 66, 0.16), transparent 24%),
+        radial-gradient(circle at top right, rgba(110, 231, 249, 0.12), transparent 26%),
+        linear-gradient(180deg, #0a0d14 0%, #0d1220 45%, #090c14 100%);
+    }
+
+    .shell {
+      width: min(1380px, calc(100% - 32px));
+      margin: 28px auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255, 140, 66, 0.12), transparent 40%),
+        linear-gradient(180deg, rgba(20, 27, 42, 0.95), rgba(10, 13, 20, 0.92));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -42% auto;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244, 184, 96, 0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy {
+      margin: 18px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.8;
+    }
+
+    .hero-strip {
+      margin-top: 26px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #d5d9e3;
+      font-size: 0.92rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 24px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel), rgba(10, 13, 20, 0.94));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.97rem;
+    }
+
+    .status-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(110, 231, 249, 0.22);
+      background: rgba(110, 231, 249, 0.08);
+      color: var(--cyan);
+      white-space: nowrap;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: #e8ecf5;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--text);
+      padding: 14px 16px;
+      font: inherit;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 46px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+        linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+      background-position:
+        calc(100% - 22px) calc(50% - 3px),
+        calc(100% - 16px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    select option {
+      background: #141b2a;
+      color: #f5f7fb;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: rgba(244, 184, 96, 0.65);
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-1px);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font: inherit;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      color: #1b1208;
+      background: linear-gradient(135deg, var(--gold), var(--gold-strong));
+      box-shadow: 0 16px 34px rgba(255, 140, 66, 0.24);
+    }
+
+    .secondary-btn {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+      border: 1px solid var(--line);
+    }
+
+    .button-row {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .metric-card {
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.83rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric-value {
+      margin-top: 10px;
+      font-size: clamp(1.2rem, 2vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .result,
+    .error {
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+    }
+
+    .result {
+      background: var(--success-bg);
+      border-color: var(--success-line);
+    }
+
+    .error {
+      background: var(--error-bg);
+      border-color: var(--error-line);
+    }
+
+    .result strong,
+    .error strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .result p,
+    .error p {
+      margin: 0;
+      color: #ebf4ef;
+      line-height: 1.7;
+    }
+
+    .suggestion-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .suggestion-card {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(244, 184, 96, 0.08), transparent 42%),
+        rgba(255, 255, 255, 0.03);
+    }
+
+    .suggestion-card h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .suggestion-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.94rem;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .chat-title {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .chat-subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.96rem;
+    }
+
+    .chat-feed {
+      display: grid;
+      gap: 14px;
+      max-height: 620px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .chat-feed::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-feed::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+    }
+
+    .bubble {
+      padding: 16px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(255, 255, 255, 0.03));
+    }
+
+    .bubble.assistant {
+      background: linear-gradient(135deg, rgba(110, 231, 249, 0.08), rgba(255, 255, 255, 0.03));
+    }
+
+    .bubble-meta {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bubble p {
+      margin: 0;
+      color: #eef2f9;
+      line-height: 1.75;
+      white-space: pre-line;
+    }
+
+    .chat-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .empty-state {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed var(--line-strong);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 18px, 1380px);
+        margin: 18px auto;
+      }
+
+      .hero,
+      .panel {
+        border-radius: 22px;
+        padding: 20px;
+      }
+
+      .form-grid,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-head,
+      .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Premium Property Intelligence</p>
+      <h1>Mortgage Powered Advisor for Bengaluru Home Decisions</h1>
+      <p class="hero-copy">
+        Evaluate a home opportunity with model-driven pricing, a polished mortgage-style summary,
+        and nearby location alternatives that better align with your budget and configuration.
+      </p>
+      <div class="hero-strip">
+        <span class="chip">Price estimate in lakhs</span>
+        <span class="chip">Mortgage-aware commentary</span>
+        <span class="chip">Alternative location discovery</span>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Property Inputs</h2>
+              <p class="panel-copy">
+                Enter the home profile you want to assess. The platform will estimate the price and prepare an advisory summary around affordability and comparable alternatives.
+              </p>
+            </div>
+            <span class="status-pill">Live advisory workflow</span>
+          </div>
+
+          <form method="post">
+            <input type="hidden" name="action" value="predict">
+            <div class="form-grid">
+              <div class="field field-wide">
+                <label for="location">Preferred Location</label>
+                <select id="location" name="location" required>
+                  {% for location in location_choices %}
+                    <option value="{{ location }}" {% if form_data.location == location %}selected{% endif %}>{{ location }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="total_sqft">Total Square Feet</label>
+                <input id="total_sqft" name="total_sqft" value="{{ form_data.total_sqft }}" placeholder="1200 or 1200-1400" required>
+                <span class="hint">Range values are averaged before being sent to the model.</span>
+              </div>
+
+              <div class="field">
+                <label for="bhk">Configuration</label>
+                <input id="bhk" name="bhk" type="number" min="1" step="1" value="{{ form_data.bhk }}" required>
+              </div>
+
+              <div class="field">
+                <label for="bath">Bathrooms</label>
+                <input id="bath" name="bath" type="number" min="1" step="1" value="{{ form_data.bath }}" required>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-btn" type="submit">Run Price Analysis</button>
+            </div>
+          </form>
+
+          {% if prediction is not none %}
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-label">Estimated Price</div>
+                <div class="metric-value">{{ "%.2f"|format(prediction) }} Lakhs</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Selected Location</div>
+                <div class="metric-value">{{ form_data.location }}</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Configuration</div>
+                <div class="metric-value">{{ form_data.bhk }} BHK / {{ form_data.bath }} Bath</div>
+              </div>
+            </div>
+
+            <div class="result">
+              <strong>Analysis complete</strong>
+              <p>The advisory assistant has used your inputs and the estimated price to prepare a mortgage-aware summary and alternative market options.</p>
+            </div>
+          {% endif %}
+
+          {% if error %}
+            <div class="error">
+              <strong>Action required</strong>
+              <p>{{ error }}</p>
+            </div>
+          {% endif %}
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Recommended Alternatives</h2>
+              <p class="panel-copy">
+                These locations are selected from the Bengaluru dataset as nearby market-fit options for your current budget, size, and property configuration.
+              </p>
+            </div>
+          </div>
+
+          {% if nearby_suggestions %}
+            <div class="suggestion-grid">
+              {% for suggestion in nearby_suggestions %}
+                <article class="suggestion-card">
+                  <h3>{{ suggestion.location }}</h3>
+                  <p>
+                    Typical pricing appears around {{ "%.1f"|format(suggestion.avg_price_lakh) }} lakhs
+                    for roughly {{ "%.0f"|format(suggestion.avg_sqft) }} sqft, based on {{ suggestion.listing_count }} matching listings.
+                  </p>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              Run an analysis to unlock nearby location recommendations aligned with the estimated budget.
+            </div>
+          {% endif %}
+        </section>
+      </div>
+
+      <aside class="panel">
+        <div class="chat-header">
+          <div>
+            <p class="eyebrow" style="margin-bottom:10px;">Advisory Desk</p>
+            <h2 class="chat-title">Mortgage Powered Advisor</h2>
+            <p class="chat-subtitle">
+              Review the property summary, mortgage-style commentary, and ask follow-up questions about fit, value, and alternatives.
+            </p>
+          </div>
+          <span class="status-pill">Context aware</span>
+        </div>
+
+        <div class="chat-feed">
+          {% if chat_history %}
+            {% for message in chat_history %}
+              <article class="bubble {{ message.role }}">
+                <p class="bubble-meta">{{ message.title }}</p>
+                <p>{{ message.content }}</p>
+              </article>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              Submit a property analysis first. The advisor will store your inputs, interpret the ML output, and suggest comparable locations.
+            </div>
+          {% endif %}
+        </div>
+
+        <form method="post" class="chat-form">
+          <input type="hidden" name="action" value="chat">
+          <label for="chat_message">Ask the advisor</label>
+          <textarea id="chat_message" name="chat_message" placeholder="Example: suggest a better value location close to this budget, or explain whether this price feels high for the chosen configuration."></textarea>
+          <button class="secondary-btn" type="submit">Send Message</button>
+        </form>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
